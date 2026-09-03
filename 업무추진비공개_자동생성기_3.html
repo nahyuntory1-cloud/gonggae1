@@ -1,0 +1,1543 @@
+<title>업무추진비 공개 자동생성기</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  :root{
+    --paper:#f6f2e8;
+    --surface:#ffffff;
+    --surface-2:#fbf9f4;
+    --ink:#22242b;
+    --ink-soft:#5d5f6c;
+    --ink-faint:#8b8d97;
+    --accent:#1d4d78;
+    --accent-strong:#123350;
+    --accent-soft:#e4edf4;
+    --line:#ddd4bf;
+    --line-soft:#e9e2d1;
+    --good:#2f7a5c; --good-soft:#e2f0e8; --good-line:#bcdcc9;
+    --warn:#a2631a; --warn-soft:#f7ead2; --warn-line:#e6c98e;
+    --danger:#a83b2a; --danger-soft:#f6e0da; --danger-line:#e6b7a8;
+    --shadow: 0 1px 2px rgba(30,32,40,.05), 0 10px 28px -16px rgba(30,32,40,.28);
+    --radius: 10px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#14171b;
+      --surface:#1b1f25;
+      --surface-2:#20242b;
+      --ink:#e9e7e0;
+      --ink-soft:#a3a6b1;
+      --ink-faint:#767a86;
+      --accent:#7fb3e0;
+      --accent-strong:#b7d9f4;
+      --accent-soft:#213543;
+      --line:#343a44;
+      --line-soft:#2a2f38;
+      --good:#7ecfa6; --good-soft:#1c3128; --good-line:#33513f;
+      --warn:#e4b06a; --warn-soft:#3a2d18; --warn-line:#5a4726;
+      --danger:#e6968a; --danger-soft:#3a2320; --danger-line:#5a352f;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14171b;
+    --surface:#1b1f25;
+    --surface-2:#20242b;
+    --ink:#e9e7e0;
+    --ink-soft:#a3a6b1;
+    --ink-faint:#767a86;
+    --accent:#7fb3e0;
+    --accent-strong:#b7d9f4;
+    --accent-soft:#213543;
+    --line:#343a44;
+    --line-soft:#2a2f38;
+    --good:#7ecfa6; --good-soft:#1c3128; --good-line:#33513f;
+    --warn:#e4b06a; --warn-soft:#3a2d18; --warn-line:#5a4726;
+    --danger:#e6968a; --danger-soft:#3a2320; --danger-line:#5a352f;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans KR', system-ui, -apple-system, sans-serif;
+    font-size:14.5px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px 80px;}
+
+  header.top{
+    position:sticky; top:0; z-index:40;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{max-width:1180px;margin:0 auto;padding:16px 20px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+  .brand{font-family:'Noto Serif KR',serif;font-weight:700;font-size:19px;letter-spacing:-.01em;}
+  .brand small{display:block;font-family:'Noto Sans KR',sans-serif;font-weight:500;font-size:11.5px;color:var(--ink-faint);letter-spacing:.03em;margin-top:2px;}
+  .steps{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;}
+  .step-pill{
+    font-size:11.5px;font-weight:600;color:var(--ink-soft);
+    background:var(--surface-2);border:1px solid var(--line);
+    padding:5px 11px 5px 8px;border-radius:999px;display:flex;align-items:center;gap:6px;
+  }
+  .step-pill b{
+    width:16px;height:16px;border-radius:50%;background:var(--accent);color:var(--surface);
+    display:inline-flex;align-items:center;justify-content:center;font-size:10px;
+  }
+
+  .hero{padding:34px 0 8px;}
+  .hero h1{font-family:'Noto Serif KR',serif;font-size:26px;margin:0 0 8px;letter-spacing:-.01em;text-wrap:balance;}
+  .hero p{margin:0;color:var(--ink-soft);max-width:62ch;font-size:14px;}
+
+  section.card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px 24px 26px;
+    margin-top:22px;
+  }
+  .card-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px;}
+  .card-num{
+    font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:12px;
+    background:var(--accent-soft);color:var(--accent-strong);
+    width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .card-head h2{font-size:16.5px;margin:0 0 3px;letter-spacing:-.005em;}
+  .card-head p{margin:0;color:var(--ink-soft);font-size:12.8px;}
+
+  .grid-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:16px;}
+  label.field{display:flex;flex-direction:column;gap:6px;font-size:12.3px;font-weight:600;color:var(--ink-soft);}
+  label.field input[type=text],label.field input[type=number],label.field select{
+    font:inherit;font-size:14px;font-weight:500;color:var(--ink);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:7px;
+    padding:8px 10px;font-family:'Noto Sans KR',sans-serif;
+  }
+  label.field input:focus,label.field select:focus,.chk:focus-within{outline:2px solid var(--accent);outline-offset:1px;}
+
+  .quarter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .qbtn{
+    font:inherit;font-size:13px;font-weight:600;color:var(--ink-soft);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:999px;
+    padding:7px 14px;cursor:pointer;transition:.12s;
+  }
+  .qbtn:hover{border-color:var(--accent);color:var(--accent);}
+  .qbtn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .qbtn.custom.active{background:var(--accent-strong);border-color:var(--accent-strong);}
+
+  .range-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--ink-soft);margin-bottom:14px;}
+  .range-row input[type=date]{
+    font:inherit;font-size:13.5px;color:var(--ink);background:var(--surface-2);
+    border:1px solid var(--line);border-radius:7px;padding:6px 9px;font-family:'IBM Plex Mono',monospace;
+  }
+  .range-summary{font-family:'Noto Serif KR',serif;font-weight:600;color:var(--accent-strong);font-size:14px;}
+
+  .toggles{display:flex;gap:18px;flex-wrap:wrap;}
+  .chk{display:flex;align-items:center;gap:8px;font-size:12.8px;color:var(--ink-soft);border-radius:6px;}
+  .chk input{width:15px;height:15px;accent-color:var(--accent);}
+
+  .upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:760px){.upload-grid{grid-template-columns:1fr;}}
+  .dropzone{
+    border:1.5px dashed var(--line);border-radius:9px;background:var(--surface-2);
+    padding:20px 16px;text-align:center;cursor:pointer;transition:.12s;position:relative;
+  }
+  .dropzone:hover,.dropzone.drag{border-color:var(--accent);background:var(--accent-soft);}
+  .dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .dz-label{font-weight:700;font-size:13.6px;margin-bottom:3px;}
+  .dz-sub{font-size:11.8px;color:var(--ink-faint);}
+  .dz-status{
+    margin-top:12px;text-align:left;font-size:12.6px;background:var(--surface);
+    border:1px solid var(--line-soft);border-radius:7px;padding:10px 12px;display:none;
+  }
+  .dz-status.show{display:block;}
+  .dz-status .fn{font-weight:700;color:var(--ink);word-break:break-all;}
+  .dz-status .meta{color:var(--ink-soft);margin-top:3px;font-family:'IBM Plex Mono',monospace;font-size:11.6px;}
+  .dz-status.ok{border-color:var(--good-line);background:var(--good-soft);}
+  .dz-status.err{border-color:var(--danger-line);background:var(--danger-soft);color:var(--danger);}
+
+  .runbar{display:flex;align-items:center;gap:12px;margin-top:18px;flex-wrap:wrap;}
+  button.primary{
+    font:inherit;font-weight:700;font-size:14px;color:#fff;background:var(--accent);
+    border:1px solid var(--accent-strong);border-radius:8px;padding:11px 20px;cursor:pointer;transition:.12s;
+    box-shadow:0 1px 0 rgba(0,0,0,.05);
+  }
+  button.primary:hover{background:var(--accent-strong);}
+  button.primary:disabled{opacity:.45;cursor:not-allowed;}
+  button.ghost{
+    font:inherit;font-weight:600;font-size:13px;color:var(--ink-soft);background:transparent;
+    border:1px solid var(--line);border-radius:8px;padding:9px 15px;cursor:pointer;transition:.12s;
+  }
+  button.ghost:hover{border-color:var(--accent);color:var(--accent);}
+  button.ghost.small,button.link.small{padding:5px 10px;font-size:11.8px;}
+  button.link{font:inherit;background:none;border:none;color:var(--accent);cursor:pointer;font-weight:600;font-size:12.6px;padding:0;text-decoration:underline;text-underline-offset:2px;}
+  .run-note{font-size:12.4px;color:var(--ink-faint);}
+
+  .sample-banner{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--warn-soft);border:1px solid var(--warn-line);color:var(--warn);
+    border-radius:8px;padding:9px 14px;font-size:12.6px;font-weight:600;margin-top:16px;
+  }
+  .sample-banner span.dot{width:7px;height:7px;border-radius:50%;background:var(--warn);flex-shrink:0;}
+
+  .summary-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:18px;}
+  @media (max-width:700px){.summary-strip{grid-template-columns:repeat(2,1fr);}}
+  .stat{background:var(--surface);padding:14px 16px;}
+  .stat .n{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:20px;font-variant-numeric:tabular-nums;}
+  .stat .l{font-size:11.6px;color:var(--ink-faint);margin-top:2px;}
+  .stat.good .n{color:var(--good);}
+  .stat.warn .n{color:var(--warn);}
+
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:9px;}
+  table.ledger{width:100%;border-collapse:collapse;font-size:12.8px;min-width:980px;}
+  table.ledger thead th{
+    position:sticky;top:0;background:var(--accent-strong);color:#fff;
+    font-weight:600;font-size:11.6px;letter-spacing:.01em;text-align:left;
+    padding:9px 10px;white-space:nowrap;z-index:2;
+  }
+  table.ledger tbody td{
+    padding:8px 10px;border-bottom:1px solid var(--line-soft);vertical-align:top;
+  }
+  table.ledger tbody tr:nth-child(even){background:var(--surface-2);}
+  table.ledger tbody tr.excluded{opacity:.42;}
+  table.ledger tbody tr.excluded td{text-decoration:line-through;text-decoration-color:var(--ink-faint);}
+  table.ledger td.num,table.ledger th.num{text-align:right;font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  table.ledger td.mono{font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+  table.ledger td[contenteditable=true]{cursor:text;border-radius:4px;}
+  table.ledger td[contenteditable=true]:hover{background:var(--accent-soft);}
+  table.ledger td[contenteditable=true]:focus{outline:2px solid var(--accent);outline-offset:-2px;background:var(--surface);}
+  table.ledger td.title-cell{min-width:230px;}
+  table.ledger td.empty-hint{color:var(--ink-faint);font-style:italic;}
+  table.ledger td.empty-hint:empty:before{content:attr(data-placeholder);pointer-events:none;}
+  table.ledger tfoot td{padding:10px;font-weight:700;border-top:2px solid var(--accent-strong);background:var(--surface-2);}
+
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap;}
+  .badge.auto{background:var(--good-soft);color:var(--good);border:1px solid var(--good-line);}
+  .badge.manual{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent);}
+  .badge.none{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn-line);}
+  .badge.added{background:var(--surface-2);color:var(--ink-soft);border:1px solid var(--line);}
+
+  .row-actions{display:flex;gap:5px;flex-wrap:wrap;}
+  select.match-select{
+    font:inherit;font-size:11.6px;background:var(--surface);border:1px solid var(--line);
+    border-radius:6px;padding:4px 5px;max-width:170px;color:var(--ink);
+  }
+  .table-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .bulk-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--accent-soft);border:1px solid var(--line);border-radius:8px;padding:9px 12px;margin-bottom:12px;}
+  .bulk-row .bulk-label{font-size:12.4px;font-weight:700;color:var(--accent-strong);}
+  .bulk-row input[type=text]{
+    font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--line);
+    border-radius:6px;padding:6px 9px;min-width:200px;flex:1;max-width:320px;
+  }
+  table.ledger td.checkcol,table.ledger th.checkcol{text-align:center;}
+  table.ledger input.row-check,#checkAll{width:15px;height:15px;accent-color:var(--accent);}
+  .leftover-note{margin-top:12px;font-size:12.2px;color:var(--ink-soft);background:var(--surface-2);border:1px solid var(--line-soft);border-radius:8px;padding:10px 13px;}
+  .leftover-note b{color:var(--ink);}
+
+  .gift-toggle{display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+  .gift-wrap{display:none;}
+  .gift-wrap.show{display:block;}
+
+  .export-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:760px){.export-grid{grid-template-columns:1fr;}}
+  .export-box{border:1px solid var(--line);border-radius:9px;padding:16px 18px;background:var(--surface-2);}
+  .export-box h3{margin:0 0 6px;font-size:14.5px;display:flex;align-items:center;gap:8px;}
+  .export-box p{margin:0 0 13px;font-size:12.4px;color:var(--ink-soft);}
+  .export-box button{width:100%;}
+  .caveat{font-size:11.5px;color:var(--ink-faint);margin-top:9px;line-height:1.5;}
+
+  footer.foot{text-align:center;color:var(--ink-faint);font-size:11.8px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line);}
+
+  .toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;}
+  .toast{background:var(--accent-strong);color:#fff;font-size:13px;font-weight:600;padding:10px 18px;border-radius:8px;box-shadow:var(--shadow);opacity:0;transform:translateY(6px);transition:.18s;}
+  .toast.show{opacity:1;transform:translateY(0);}
+
+  .icon{width:15px;height:15px;flex-shrink:0;}
+
+  /* print / export offscreen doc styling */
+  .print-doc{font-family:'Noto Sans KR',sans-serif;color:#111;background:#fff;padding:26px 30px;}
+  .print-doc h2.print-title{font-family:'Noto Serif KR',serif;text-align:center;font-size:19px;margin:0 0 16px;}
+  .print-doc table.print-table{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed;}
+  .print-doc table.print-table th,.print-doc table.print-table td{border:1px solid #333;padding:5px 6px;word-break:break-word;}
+  .print-doc table.print-table thead th{background:#dfeaf2;font-weight:700;text-align:center;}
+  .print-doc table.print-table td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .print-doc table.print-table td.ctr{text-align:center;}
+  .print-doc table.print-table tfoot td{font-weight:700;background:#f2efe6;text-align:center;}
+  .print-doc .print-unit{text-align:right;font-size:10.5px;color:#444;margin:14px 0 4px;}
+  .print-doc .print-gift-title{font-family:'Noto Serif KR',serif;text-align:center;font-size:15px;background:#c9dbe8;padding:7px;margin:26px 0 0;}
+</style>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">업무추진비 공개 자동생성기<small>원인행위목록 × 카드 매출내역 금액 매칭 → 재정공개표 자동 작성</small></div>
+    <div class="steps">
+      <span class="step-pill"><b>1</b>기본정보</span>
+      <span class="step-pill"><b>2</b>자료 업로드</span>
+      <span class="step-pill"><b>3</b>매칭 검수</span>
+      <span class="step-pill"><b>4</b>내보내기</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <h1>원인행위 결의 내역과 법인카드 매출 내역을 금액 기준으로 자동 대사(對査)하여, 분기별 업무추진비 공개표를 만듭니다.</h1>
+    <p>「원인행위목록」의 결의 건과 「상세매출내역(국내)」의 카드 승인 건을 금액으로 짝지어 공개 양식(집행일자·집행시간·집행내역·집행액·사용처)을 자동 작성합니다. 자동으로 짝을 찾지 못한 건은 직접 선택해 매칭할 수 있습니다.</p>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card">
+    <div class="card-head">
+      <div class="card-num">1</div>
+      <div>
+        <h2>기본 정보</h2>
+        <p>공개 대상 기관과 분기(집행 기간)를 지정하세요. 학교 회계연도는 3월에 시작합니다.</p>
+      </div>
+    </div>
+
+    <div class="grid-form">
+      <label class="field">기관명
+        <input type="text" id="orgName" value="행복중학교" placeholder="예: 서연중학교">
+      </label>
+      <label class="field">학년도
+        <input type="number" id="yearInput" value="2026" min="2000" max="2100">
+      </label>
+    </div>
+
+    <div class="quarter-row" id="quarterRow">
+      <button class="qbtn" data-q="1">1/4분기 (3~5월)</button>
+      <button class="qbtn" data-q="2">2/4분기 (6~8월)</button>
+      <button class="qbtn" data-q="3">3/4분기 (9~11월)</button>
+      <button class="qbtn" data-q="4">4/4분기 (12~2월)</button>
+      <button class="qbtn custom" data-q="custom">기간 직접 지정</button>
+    </div>
+
+    <div class="range-row">
+      <span>집행기간</span>
+      <input type="date" id="fromDate">
+      <span>~</span>
+      <input type="date" id="toDate">
+      <span class="range-summary" id="rangeSummary"></span>
+    </div>
+
+    <div class="toggles">
+      <label class="chk"><input type="checkbox" id="excludeUtility" checked> 정기 업무추진비(직책급 등, 카드 사용 없는 「공공요금및용역」) 제외</label>
+      <label class="chk"><input type="checkbox" id="onlyApproved" checked> 「원인행위결재완료」 건만 포함</label>
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card">
+    <div class="card-head">
+      <div class="card-num">2</div>
+      <div>
+        <h2>자료 업로드</h2>
+        <p>두 엑셀 파일을 각각 업로드하세요. 클릭하거나 파일을 끌어다 놓을 수 있습니다.</p>
+      </div>
+    </div>
+
+    <div class="upload-grid">
+      <div class="dropzone" id="dzCause">
+        <input type="file" id="fileCause" accept=".xlsx,.xls">
+        <div class="dz-label">① 원인행위목록.xlsx</div>
+        <div class="dz-sub">결의 건별 원인행위금액 · 제목 · 유형이 담긴 파일</div>
+        <div class="dz-status" id="statusCause"></div>
+      </div>
+      <div class="dropzone" id="dzSales">
+        <input type="file" id="fileSales" accept=".xlsx,.xls">
+        <div class="dz-label">② 상세매출내역국내목록.xlsx</div>
+        <div class="dz-sub">법인카드 승인 건별 매출일자 · 매출금액 · 가맹점명이 담긴 파일</div>
+        <div class="dz-status" id="statusSales"></div>
+      </div>
+    </div>
+
+    <div class="runbar">
+      <button class="primary" id="btnMatch" disabled>금액 기준 자동 매칭 실행</button>
+      <button class="ghost" id="btnLoadSample">예시 데이터로 미리보기</button>
+      <button class="ghost" id="btnResetAll">전체 초기화</button>
+      <span class="run-note" id="runNote"></span>
+    </div>
+
+    <div class="sample-banner" id="sampleBanner" style="display:none;">
+      <span class="dot"></span> 지금 표시된 내용은 예시(가상) 데이터입니다. 실제 파일을 업로드하면 자동으로 예시 데이터가 지워집니다.
+    </div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card" id="resultSection" style="display:none;">
+    <div class="card-head">
+      <div class="card-num">3</div>
+      <div>
+        <h2>매칭 결과 검수</h2>
+        <p>금액이 정확히 일치하는 건은 자동으로 짝지어집니다. 셀을 클릭해 내용을 고치거나, 미매칭 건은 목록에서 직접 짝을 선택하세요.</p>
+      </div>
+    </div>
+
+    <div class="sample-banner" id="noTimeBanner" style="display:none;">
+      <span class="dot"></span> 업로드하신 매출내역 파일에는 승인시각 항목 자체가 없어 <b>집행시간 칸이 비어 있는 것이 정상</b>입니다 (일자·금액·가맹점명은 정상 반영). 시간이 필요하면 승인시각이 있는 카드사 파일을 사용하시거나, 표의 집행시간 칸을 클릭해 직접 입력하세요.
+    </div>
+
+    <div class="summary-strip" id="summaryStrip"></div>
+
+    <div class="table-toolbar">
+      <div style="display:flex;gap:8px;">
+        <button class="ghost small" id="btnAddRow">+ 행 직접 추가</button>
+        <button class="ghost small" id="btnRematch">미매칭 건 다시 자동매칭</button>
+      </div>
+      <span class="run-note">날짜순 정렬 · 제외된 건은 취소선으로 표시되며 집계·내보내기에서 빠집니다</span>
+    </div>
+
+    <div class="bulk-row">
+      <span class="bulk-label">체크한 행에 집행대상 일괄 입력</span>
+      <input type="text" id="bulkTargetInput" placeholder="예: 학교장 외 4명">
+      <button class="ghost small" id="btnApplyBulkTarget">선택 행에 적용</button>
+      <span class="run-note" id="bulkCheckedCount"></span>
+    </div>
+
+    <div class="table-scroll">
+      <table class="ledger">
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox" id="checkAll" title="전체 선택"></th>
+            <th>#</th><th>집행일자</th><th>집행시간</th><th>집행내역</th>
+            <th class="num">집행액(원)</th><th>장소(사용처)</th><th>집행대상</th>
+            <th>매칭상태</th><th>작업</th>
+          </tr>
+        </thead>
+        <tbody id="ledgerBody"></tbody>
+        <tfoot><tr><td colspan="5" style="text-align:right;">합계</td><td class="num" id="totalCell">0</td><td colspan="4"></td></tr></tfoot>
+      </table>
+    </div>
+
+    <div class="leftover-note" id="leftoverNote" style="display:none;"></div>
+
+    <div class="gift-toggle">
+      <label class="chk"><input type="checkbox" id="giftEnable"> 상품권 구매·사용 내역 표 포함 (별도 수기 입력 — 두 업로드 파일에는 포함되지 않는 정보입니다)</label>
+    </div>
+    <div class="gift-wrap" id="giftWrap">
+      <div class="table-scroll">
+        <table class="ledger" id="giftTable">
+          <thead><tr><th>구매일자</th><th>구매처</th><th>상품권종류</th><th>용도</th><th class="num">구매수량</th><th class="num">총구매액</th><th>비고</th><th>작업</th></tr></thead>
+          <tbody id="giftBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px;"><button class="ghost small" id="btnAddGift">+ 상품권 내역 행 추가</button></div>
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="card" id="exportSection" style="display:none;">
+    <div class="card-head">
+      <div class="card-num">4</div>
+      <div>
+        <h2>내보내기</h2>
+        <p id="exportTitlePreview" style="font-weight:700;color:var(--accent-strong);"></p>
+      </div>
+    </div>
+
+    <div class="export-grid">
+      <div class="export-box">
+        <h3>📄 HWPX 다운로드</h3>
+        <p>한글(한컴오피스)에서 바로 열어 편집할 수 있는 표 형식 문서로 내보냅니다.</p>
+        <button class="primary" id="btnExportHwpx">HWPX 파일 생성</button>
+        <div class="caveat">자동 생성된 최소 구조의 hwpx입니다. 한글에서 열 때 "복구" 안내가 뜨더라도 대부분 정상적으로 열리며, 열린 후 "다른 이름으로 저장"으로 다시 저장하면 이후에는 문제없이 사용할 수 있습니다.</div>
+        <div class="caveat" id="hwpxSandboxHint" style="display:none;color:var(--warn);">⚠ 이 웹 링크(미리보기) 화면에서는 브라우저 정책상 hwpx 저장이 지원되지 않을 수 있습니다. 저장이 안 되면, 함께 받은 html 파일을 내려받아 그 파일을 더블클릭으로 열어 사용해주세요 — 그 화면에서는 hwpx·PDF 모두 정상 저장됩니다.</div>
+      </div>
+      <div class="export-box">
+        <h3>🖨️ PDF 다운로드</h3>
+        <p>학교 홈페이지 공개용으로 그대로 게시할 수 있는 인쇄용 PDF를 생성합니다.</p>
+        <button class="primary" id="btnExportPdf">PDF 파일 생성</button>
+        <div class="caveat">화면에 보이는 표를 그대로 A4 용지에 맞춰 여러 페이지로 나눠 담습니다.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">업로드한 파일은 이 페이지(브라우저) 안에서만 계산되며 서버로 전송되지 않습니다.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+"use strict";
+/* ============================= utils ============================= */
+const $ = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
+let __uid=0; const uid=()=> 'x'+(++__uid)+'_'+Math.random().toString(36).slice(2,7);
+function esc(s){ s = (s===null||s===undefined) ? '' : String(s);
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toWon(n){ n = Number(n)||0; return n.toLocaleString('ko-KR'); }
+/* ============================= file saving (works both as a hosted preview and as a saved local file) ============================= */
+let __downloadsCap = undefined; // undefined=unknown yet, null=unavailable, object=ready
+(async ()=>{
+  try{
+    if(typeof window.claude !== 'undefined' && typeof window.claude.use === 'function'){
+      __downloadsCap = await window.claude.use('downloads');
+    } else {
+      __downloadsCap = null;
+    }
+  }catch(e){ __downloadsCap = null; }
+  if(__downloadsCap){
+    const hint = $('#hwpxSandboxHint');
+    if(hint) hint.style.display = 'block';
+  }
+})();
+async function saveFile(filename, data){
+  if(__downloadsCap === undefined){
+    // capability probe still pending; give it a brief moment
+    await new Promise(r=>setTimeout(r,400));
+  }
+  if(__downloadsCap){
+    try{
+      await __downloadsCap.save({filename, data});
+      return {ok:true, via:'capability'};
+    }catch(err){
+      return {ok:false, err};
+    }
+  }
+  try{
+    const blob = (data instanceof Blob) ? data : new Blob([data]);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+    return {ok:true, via:'blob'};
+  }catch(err){
+    return {ok:false, err};
+  }
+}
+function toast(msg, isErr){
+  const wrap = $('#toastWrap');
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg;
+  if(isErr) el.style.background='var(--danger)';
+  wrap.appendChild(el);
+  requestAnimationFrame(()=> el.classList.add('show'));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),250); }, 3200);
+}
+function isLeap(y){ return (y%4===0 && y%100!==0) || y%400===0; }
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function normalizeDateVal(v){
+  if(v===null||v===undefined||v==='') return '';
+  if(v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${pad2(v.getMonth()+1)}-${pad2(v.getDate())}`;
+  let s = String(v).trim();
+  // some card companies combine two dates in one cell, e.g. "2026.04.30(2026.04.29)"
+  // (접수일자(승인일자)) — the parenthesized date is the actual transaction date, so prefer it.
+  const paren = s.match(/\(([^)]+)\)/);
+  if(paren) s = paren[1].trim();
+  let m = s.match(/^(\d{4})(\d{2})(\d{2})$/);
+  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+  m = s.match(/^(\d{4})[-.\/](\d{1,2})[-.\/](\d{1,2})/);
+  if(m) return `${m[1]}-${pad2(+m[2])}-${pad2(+m[3])}`;
+  if(typeof v === 'number' && isFinite(v)){
+    const d = new Date(Math.round((v-25569)*86400*1000));
+    return `${d.getUTCFullYear()}-${pad2(d.getUTCMonth()+1)}-${pad2(d.getUTCDate())}`;
+  }
+  return s;
+}
+function normalizeTimeVal(v){
+  if(v===null||v===undefined||v==='') return '';
+  let s = String(v).trim();
+  if(/^\d{1,2}:\d{2}(:\d{2})?$/.test(s)) return s.slice(0,5);
+  s = s.replace(/\D/g,'');
+  if(s.length===5) s='0'+s;
+  if(s.length>=6) return `${s.slice(0,2)}:${s.slice(2,4)}`;
+  if(s.length===4) return `${s.slice(0,2)}:${s.slice(2,4)}`;
+  return s;
+}
+function parseAmountFromText(t){
+  const n = Number(String(t).replace(/[^0-9.\-]/g,''));
+  return isFinite(n) ? n : 0;
+}
+
+/* ============================= quarter / range ============================= */
+function quarterRange(year, q){
+  year = +year;
+  if(q===1) return {from:`${year}-03-01`, to:`${year}-05-31`, label:`${year}학년도 1/4분기`};
+  if(q===2) return {from:`${year}-06-01`, to:`${year}-08-31`, label:`${year}학년도 2/4분기`};
+  if(q===3) return {from:`${year}-09-01`, to:`${year}-11-30`, label:`${year}학년도 3/4분기`};
+  const feb = isLeap(year+1) ? 29 : 28;
+  return {from:`${year}-12-01`, to:`${year+1}-02-${pad2(feb)}`, label:`${year}학년도 4/4분기`};
+}
+function ymLabel(dateStr){
+  const m = dateStr.match(/^(\d{4})-(\d{2})/);
+  return m ? `${m[1]}.${+m[2]}월` : dateStr;
+}
+function academicYearOf(dateStr){
+  const m = dateStr.match(/^(\d{4})-(\d{2})/);
+  if(!m) return null;
+  const y=+m[1], mo=+m[2];
+  return mo>=3 ? y : y-1;
+}
+
+/* ============================= state ============================= */
+const state = {
+  orgName:'행복중학교',
+  activeQuarter:1,
+  fromDate:'', toDate:'',
+  excludeUtility:true, onlyApproved:true,
+  rawCauses:null, rawSales:null,
+  causeFileName:'', salesFileName:'',
+  entries:[], salesPool:[], giftRows:[],
+  isSample:false, salesHasTime:true,
+};
+
+/* ============================= sample (fabricated) data ============================= */
+function buildSampleData(){
+  const causes = [
+    {no:'00101', date:'2026-03-05', category:'물품(상품권)', title:'내빈접대물품 구입(다과)', amount:45000, status:'원인행위결재완료'},
+    {no:'00108', date:'2026-03-12', category:'기타', title:'2학년부 학년 협의회비 지급', amount:130000, status:'원인행위결재완료'},
+    {no:'00120', date:'2026-03-20', category:'공공요금및용역', title:'3월 직책급 업무추진비 지급', amount:350000, status:'원인행위결재완료'},
+    {no:'00155', date:'2026-04-02', category:'기타', title:'2026학년도 1회 학교운영위원회 협의회비 지급', amount:280000, status:'원인행위결재완료'},
+    {no:'00162', date:'2026-04-18', category:'물품(상품권)', title:'교직원 간담회 간식 구입', amount:96000, status:'원인행위결재완료'},
+    {no:'00171', date:'2026-05-09', category:'기타', title:'스승의 날 교직원 격려 간식 구입비 지급', amount:210000, status:'원인행위결재완료'},
+  ];
+  const sales = [
+    {date:'2026-03-05', time:'11:20', amount:45000, merchant:'지마켓', canceled:false},
+    {date:'2026-03-12', time:'18:41', amount:130000, merchant:'커피베이', canceled:false},
+    {date:'2026-03-15', time:'09:07', amount:12000, merchant:'세븐일레븐', canceled:false},
+    {date:'2026-04-02', time:'19:02', amount:280000, merchant:'한우촌', canceled:false},
+    {date:'2026-04-19', time:'14:36', amount:96000, merchant:'파리바게트', canceled:false},
+    {date:'2026-05-09', time:'13:12', amount:205000, merchant:'모두의식당', canceled:false},
+  ];
+  return {causes, sales};
+}
+
+/* ============================= excel parsing ============================= */
+// Card companies each export a different column layout (신한/BC style "매출일자·승인시각·매출금액·가맹점명",
+// NH농협 style "접수일자/(승인일자)·청구금액·가맹점명/국가명(도시명)", etc). To work with "whichever file"
+// gets uploaded, header matching is substring-based and tries several known aliases per field.
+function findHeaderRowIndex(rows, needles){
+  const list = Array.isArray(needles)? needles : [needles];
+  for(let i=0;i<Math.min(rows.length,10);i++){
+    const r = rows[i]||[];
+    if(r.some(c=> list.some(n=> String(c||'').indexOf(n) !== -1))) return i;
+  }
+  return 0;
+}
+function colIndex(header, needle, fromLast){
+  return findColFlexible(header, [needle], fromLast);
+}
+// tries each candidate substring in priority order; within a candidate, scans left-to-right
+// (or right-to-left when fromLast) and returns the first header cell containing it.
+function findColFlexible(header, candidates, fromLast){
+  for(const cand of candidates){
+    if(fromLast){
+      for(let i=header.length-1;i>=0;i--) if(String(header[i]||'').indexOf(cand)!==-1) return i;
+    } else {
+      for(let i=0;i<header.length;i++) if(String(header[i]||'').indexOf(cand)!==-1) return i;
+    }
+  }
+  return -1;
+}
+function isSummaryRow(row){
+  return (row||[]).some(c=>{
+    const t = String(c||'').replace(/\s/g,'');
+    return t==='합계' || t==='총계' || (t.length>=2 && t.length<=4 && t.startsWith('합') && t.endsWith('계'));
+  });
+}
+function parseCauseRows(rows){
+  const hIdx = findHeaderRowIndex(rows,['원인행위금액']);
+  const header = rows[hIdx]||[];
+  const cNo = findColFlexible(header,['번호'],false);
+  const cDate = findColFlexible(header,['일자'],false);
+  const cCat = findColFlexible(header,['유형'],true);
+  const cTitle = findColFlexible(header,['제목'],false);
+  const cAmt = findColFlexible(header,['원인행위금액'],false);
+  const cStatus = findColFlexible(header,['진행상태'],false);
+  const out=[];
+  for(let i=hIdx+1;i<rows.length;i++){
+    const r = rows[i]; if(!r) continue;
+    if(isSummaryRow(r)) continue;
+    const noVal = cNo>=0? r[cNo] : null;
+    if(noVal===null||noVal===undefined||String(noVal).trim()==='') continue;
+    const title = cTitle>=0? String(r[cTitle]||'').trim() : '';
+    const amount = cAmt>=0? parseAmountFromText(r[cAmt]) : 0;
+    if(!title && !amount) continue;
+    out.push({
+      no:String(noVal).trim(),
+      date: cDate>=0? normalizeDateVal(r[cDate]) : '',
+      category: cCat>=0? String(r[cCat]||'').trim() : '',
+      title, amount,
+      status: cStatus>=0? String(r[cStatus]||'').trim() : ''
+    });
+  }
+  return out;
+}
+const SALES_FIELD_ALIASES = {
+  amount: ['매출금액','청구금액','승인금액','이용금액','결제금액','사용금액'],
+  date: ['매출일자','승인일자','이용일자','거래일자','사용일자','접수일자'],
+  time: ['승인시각','승인시간','거래시각','이용시각','매출시각'],
+  merchant: ['가맹점명','이용가맹점','거래처명','가맹점'],
+  cancelFlag: ['매출취소여부','취소여부'],
+  usageType: ['매출종류','거래구분','승인구분','사용구분','거래유형'],
+};
+function parseSalesRows(rows){
+  const hIdx = findHeaderRowIndex(rows, SALES_FIELD_ALIASES.amount.concat(SALES_FIELD_ALIASES.merchant));
+  const header = rows[hIdx]||[];
+  const cDate = findColFlexible(header, SALES_FIELD_ALIASES.date, false);
+  const cTime = findColFlexible(header, SALES_FIELD_ALIASES.time, false);
+  const cAmt = findColFlexible(header, SALES_FIELD_ALIASES.amount, false);
+  const cMerchant = findColFlexible(header, SALES_FIELD_ALIASES.merchant, false);
+  const cCancel = findColFlexible(header, SALES_FIELD_ALIASES.cancelFlag, false);
+  const cUsageType = findColFlexible(header, SALES_FIELD_ALIASES.usageType, false);
+  const out=[];
+  let anyTime=false;
+  for(let i=hIdx+1;i<rows.length;i++){
+    const r = rows[i]; if(!r) continue;
+    if(isSummaryRow(r)) continue;
+    const dateVal = cDate>=0? r[cDate] : null;
+    const date = (dateVal!==null&&dateVal!==undefined&&String(dateVal).trim()!=='') ? normalizeDateVal(dateVal) : '';
+    const amount = cAmt>=0? parseAmountFromText(r[cAmt]) : 0;
+    const merchant = cMerchant>=0? String(r[cMerchant]||'').trim() : '';
+    if(!date && !amount && !merchant) continue;
+    let canceled = cCancel>=0? String(r[cCancel]||'').trim().toUpperCase()==='Y' : false;
+    if(!canceled && cUsageType>=0) canceled = String(r[cUsageType]||'').indexOf('취소') !== -1;
+    const time = cTime>=0? normalizeTimeVal(r[cTime]) : '';
+    if(time) anyTime = true;
+    out.push({ date, time, amount, merchant, canceled });
+  }
+  out.hasTimeData = anyTime && cTime>=0;
+  return out;
+}
+function readWorkbookFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      try{
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data,{type:'array', cellDates:true});
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet,{header:1, raw:true, defval:null});
+        resolve(rows);
+      }catch(err){ reject(err); }
+    };
+    reader.onerror = ()=> reject(new Error('파일을 읽을 수 없습니다'));
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+/* ============================= matching engine ============================= */
+function dateDiffDays(a,b){
+  if(!a||!b) return 9999;
+  const da=new Date(a+'T00:00:00'), db=new Date(b+'T00:00:00');
+  return Math.abs((da-db)/86400000);
+}
+function isUtilityCategory(cat){ return String(cat||'').indexOf('공공요금') !== -1; }
+function isApprovedStatus(st){ return String(st||'').indexOf('완료') !== -1; }
+
+function rebuildSalesPool(){
+  const sales = state.rawSales || [];
+  state.salesPool = sales.filter(s=> !s.canceled && s.amount>0).map(s=>({
+    id:uid(), date:s.date, time:s.time, amount:s.amount, merchant:s.merchant, usedBy:null
+  }));
+}
+function inRange(dateStr){
+  if(!dateStr) return false;
+  if(state.fromDate && dateStr < state.fromDate) return false;
+  if(state.toDate && dateStr > state.toDate) return false;
+  return true;
+}
+function runFullMatch(){
+  if(!state.rawCauses){ toast('원인행위목록을 먼저 업로드하세요', true); return; }
+  if(!state.rawSales){ toast('상세매출내역을 먼저 업로드하세요', true); return; }
+  rebuildSalesPool();
+  const filtered = state.rawCauses.filter(c=>{
+    if(!inRange(c.date)) return false;
+    if(state.excludeUtility && isUtilityCategory(c.category)) return false;
+    if(state.onlyApproved && !isApprovedStatus(c.status)) return false;
+    return true;
+  }).sort((a,b)=> a.date<b.date?-1:a.date>b.date?1:0);
+
+  const entries = [];
+  filtered.forEach(c=>{
+    const candidates = state.salesPool.filter(s=> !s.usedBy && s.amount===c.amount);
+    let chosen=null;
+    if(candidates.length===1) chosen=candidates[0];
+    else if(candidates.length>1){
+      candidates.sort((a,b)=> dateDiffDays(a.date,c.date)-dateDiffDays(b.date,c.date));
+      chosen=candidates[0];
+    }
+    const id = uid();
+    if(chosen){ chosen.usedBy = id; }
+    entries.push({
+      id, kind:'cause', causeNo:c.no,
+      date: chosen? chosen.date : c.date,
+      time: chosen? chosen.time : '',
+      title: c.title,
+      amount: c.amount,
+      place: chosen? chosen.merchant : '',
+      target: '',
+      status: chosen? 'auto' : 'none',
+      saleId: chosen? chosen.id : null,
+      excluded:false, checked:false
+    });
+  });
+  state.entries = entries;
+  state.isSample = false;
+  $('#sampleBanner').style.display='none';
+  render();
+  toast(`자동 매칭 완료 — 총 ${entries.length}건 중 ${entries.filter(e=>e.status==='auto').length}건 자동 매칭`);
+}
+function rematchUnmatchedOnly(){
+  if(!state.entries.length){ return; }
+  let count=0;
+  state.entries.filter(e=>e.status==='none').forEach(e=>{
+    const candidates = state.salesPool.filter(s=> !s.usedBy && s.amount===e.amount);
+    let chosen=null;
+    if(candidates.length===1) chosen=candidates[0];
+    else if(candidates.length>1){
+      candidates.sort((a,b)=> dateDiffDays(a.date,e.date)-dateDiffDays(b.date,e.date));
+      chosen=candidates[0];
+    }
+    if(chosen){
+      chosen.usedBy = e.id;
+      e.saleId = chosen.id; e.date = chosen.date; e.time = chosen.time; e.place = chosen.merchant;
+      e.status='auto'; count++;
+    }
+  });
+  render();
+  toast(count? `${count}건을 추가로 매칭했습니다` : '추가로 매칭할 수 있는 건이 없습니다');
+}
+
+/* ============================= rendering ============================= */
+function unusedSales(){ return state.salesPool.filter(s=>!s.usedBy); }
+
+function badgeHtml(status){
+  const map = {
+    auto:['auto','자동매칭'], manual:['manual','수동매칭'],
+    none:['none','미매칭'], added:['added','직접추가']
+  };
+  const [cls,label] = map[status]||map.none;
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function renderSummary(){
+  const active = state.entries.filter(e=>!e.excluded);
+  const auto = active.filter(e=>e.status==='auto').length;
+  const manual = active.filter(e=>e.status==='manual').length;
+  const none = active.filter(e=>e.status==='none').length;
+  const total = active.reduce((s,e)=>s+(Number(e.amount)||0),0);
+  $('#summaryStrip').innerHTML = `
+    <div class="stat"><div class="n">${active.length}</div><div class="l">공개 대상 건수</div></div>
+    <div class="stat good"><div class="n">${auto+manual}</div><div class="l">매칭 완료 (자동 ${auto} · 수동 ${manual})</div></div>
+    <div class="stat warn"><div class="n">${none}</div><div class="l">미매칭</div></div>
+    <div class="stat"><div class="n" style="font-size:16px;">${toWon(total)}원</div><div class="l">집행액 합계</div></div>
+  `;
+}
+
+function updateBulkUI(){
+  $('#checkAll').checked = state.entries.length>0 && state.entries.every(e=>e.checked);
+  const checkedCount = state.entries.filter(e=>e.checked).length;
+  $('#bulkCheckedCount').textContent = checkedCount? `${checkedCount}건 선택됨` : '체크박스로 행을 선택하세요';
+}
+function matchSelectHtml(entry){
+  const opts = unusedSales().map(s=> `<option value="${s.id}">${s.date.slice(5)} ${s.time||''} · ${toWon(s.amount)}원 · ${esc(s.merchant)}</option>`).join('');
+  return `<select class="match-select" data-action="manual-match" data-id="${entry.id}">
+    <option value="">직접 매칭 선택…</option>${opts}
+  </select>`;
+}
+
+function renderLedger(){
+  const tbody = $('#ledgerBody');
+  const sorted = state.entries.slice().sort((a,b)=>{
+    const da=a.date||'9999', db=b.date||'9999';
+    if(da!==db) return da<db?-1:1;
+    return (a.time||'').localeCompare(b.time||'');
+  });
+  let html='';
+  sorted.forEach((e,idx)=>{
+    const rowCls = e.excluded? 'excluded' : '';
+    let actions = '';
+    if(e.kind==='added'){
+      actions += `<button class="ghost small" data-action="delete" data-id="${e.id}">삭제</button>`;
+    } else {
+      actions += e.excluded
+        ? `<button class="ghost small" data-action="restore" data-id="${e.id}">포함</button>`
+        : `<button class="ghost small" data-action="exclude" data-id="${e.id}">제외</button>`;
+      if(e.status==='auto' || e.status==='manual'){
+        actions += `<button class="ghost small" data-action="unmatch" data-id="${e.id}">매칭해제</button>`;
+      }
+    }
+    let statusCell = badgeHtml(e.status);
+    let matchCell = '';
+    if(e.status==='none' && e.kind!=='added'){
+      matchCell = matchSelectHtml(e);
+    }
+    html += `<tr data-id="${e.id}" class="${rowCls}">
+      <td class="checkcol"><input type="checkbox" class="row-check" data-id="${e.id}" ${e.checked?'checked':''}></td>
+      <td class="mono">${idx+1}</td>
+      <td class="mono" contenteditable="true" data-field="date">${esc(e.date)}</td>
+      <td class="mono ${e.time?'':'empty-hint'}" contenteditable="true" data-field="time" data-placeholder="${state.salesHasTime?'직접 입력':'시간정보 없음'}">${esc(e.time)}</td>
+      <td class="title-cell" contenteditable="true" data-field="title">${esc(e.title)}</td>
+      <td class="num" contenteditable="true" data-field="amount">${toWon(e.amount)}</td>
+      <td contenteditable="true" data-field="place">${esc(e.place)}</td>
+      <td contenteditable="true" data-field="target" class="${e.target?'':'empty-hint'}" data-placeholder="직접 입력">${esc(e.target)}</td>
+      <td>${statusCell}${matchCell? '<div style="margin-top:5px;">'+matchCell+'</div>':''}</td>
+      <td class="row-actions">${actions}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html || `<tr><td colspan="10" style="text-align:center;color:var(--ink-faint);padding:22px;">업로드 후 [금액 기준 자동 매칭 실행]을 눌러주세요.</td></tr>`;
+
+  const activeTotal = state.entries.filter(e=>!e.excluded).reduce((s,e)=>s+(Number(e.amount)||0),0);
+  $('#totalCell').textContent = toWon(activeTotal);
+  updateBulkUI();
+
+  const leftover = unusedSales();
+  const note = $('#leftoverNote');
+  if(leftover.length){
+    note.style.display='block';
+    note.innerHTML = `<b>미사용 매출내역 ${leftover.length}건</b> — 짝이 맞는 원인행위가 없는 카드 승인 건입니다. 업무추진비 외 용도이거나, 원인행위 등록이 누락되었을 수 있어요. (예: ${leftover.slice(0,4).map(s=>`${s.date.slice(5)} ${toWon(s.amount)}원 ${esc(s.merchant)}`).join(', ')}${leftover.length>4?' 외':''})`;
+  } else {
+    note.style.display='none';
+  }
+}
+
+function renderGift(){
+  const tbody = $('#giftBody');
+  tbody.innerHTML = state.giftRows.map(g=>`
+    <tr data-id="${g.id}">
+      <td class="mono" contenteditable="true" data-gfield="date">${esc(g.date)}</td>
+      <td contenteditable="true" data-gfield="vendor">${esc(g.vendor)}</td>
+      <td contenteditable="true" data-gfield="type">${esc(g.type)}</td>
+      <td contenteditable="true" data-gfield="purpose">${esc(g.purpose)}</td>
+      <td class="num" contenteditable="true" data-gfield="qty">${esc(g.qty)}</td>
+      <td class="num" contenteditable="true" data-gfield="amount">${toWon(g.amount)}</td>
+      <td contenteditable="true" data-gfield="note">${esc(g.note)}</td>
+      <td><button class="ghost small" data-gaction="delete" data-id="${g.id}">삭제</button></td>
+    </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;color:var(--ink-faint);padding:14px;">행을 추가해 입력하세요.</td></tr>`;
+}
+
+function currentTitleMeta(){
+  const from = state.fromDate, to = state.toDate;
+  let title;
+  if(state.activeQuarter && state.activeQuarter!=='custom' && from && to){
+    const q = quarterRange(+$('#yearInput').value, state.activeQuarter);
+    title = `${q.label} (${ymLabel(from)}~${ymLabel(to)}) 업무추진비 공개`;
+  } else if(from && to){
+    title = `${esc(state.orgName)} 업무추진비 공개 (${ymLabel(from)}~${ymLabel(to)})`;
+  } else {
+    title = `${state.orgName} 업무추진비 공개`;
+  }
+  return title;
+}
+
+function render(){
+  const hasData = !!(state.rawCauses && state.rawSales);
+  $('#btnMatch').disabled = !hasData;
+  const hasEntries = state.entries.length>0;
+  $('#resultSection').style.display = hasEntries? '' : 'none';
+  $('#exportSection').style.display = hasEntries? '' : 'none';
+  if(!hasEntries) return;
+  $('#noTimeBanner').style.display = state.salesHasTime? 'none' : 'flex';
+  renderSummary();
+  renderLedger();
+  renderGift();
+  $('#exportTitlePreview').textContent = `${currentTitleMeta()}  ·  ${state.orgName}`;
+}
+
+/* ============================= events: step 1 ============================= */
+function setActiveQuarterButtons(val){
+  $$('.qbtn').forEach(b=> b.classList.toggle('active', b.dataset.q===String(val)));
+}
+function applyQuarter(q){
+  state.activeQuarter = q;
+  setActiveQuarterButtons(q);
+  if(q!=='custom'){
+    const r = quarterRange(+$('#yearInput').value, q);
+    state.fromDate = r.from; state.toDate = r.to;
+    $('#fromDate').value = r.from; $('#toDate').value = r.to;
+  }
+  updateRangeSummary();
+}
+function updateRangeSummary(){
+  const from = $('#fromDate').value, to = $('#toDate').value;
+  state.fromDate = from; state.toDate = to;
+  $('#rangeSummary').textContent = (from&&to) ? `${ymLabel(from)} ~ ${ymLabel(to)}` : '';
+}
+$('#yearInput').addEventListener('input', ()=>{ if(state.activeQuarter!=='custom') applyQuarter(state.activeQuarter); });
+$('#orgName').addEventListener('input', (e)=>{ state.orgName = e.target.value || '기관명 미입력'; render(); });
+$$('.qbtn').forEach(b=> b.addEventListener('click', ()=> applyQuarter(b.dataset.q==='custom'?'custom':+b.dataset.q)));
+$('#fromDate').addEventListener('change', ()=>{ setActiveQuarterButtons('custom'); state.activeQuarter='custom'; updateRangeSummary(); });
+$('#toDate').addEventListener('change', ()=>{ setActiveQuarterButtons('custom'); state.activeQuarter='custom'; updateRangeSummary(); });
+$('#excludeUtility').addEventListener('change', e=> state.excludeUtility = e.target.checked);
+$('#onlyApproved').addEventListener('change', e=> state.onlyApproved = e.target.checked);
+
+/* ============================= events: step 2 uploads ============================= */
+function wireDropzone(zoneId, inputId, statusId, onFile){
+  const zone = $(zoneId), input = $(inputId), status = $(statusId);
+  ['dragenter','dragover'].forEach(ev=> zone.addEventListener(ev, e=>{ e.preventDefault(); zone.classList.add('drag'); }));
+  ['dragleave','drop'].forEach(ev=> zone.addEventListener(ev, e=>{ e.preventDefault(); zone.classList.remove('drag'); }));
+  zone.addEventListener('drop', e=>{
+    const f = e.dataTransfer.files[0]; if(f){ input.files = e.dataTransfer.files; handle(f); }
+  });
+  input.addEventListener('change', ()=>{ const f = input.files[0]; if(f) handle(f); });
+  async function handle(f){
+    status.className='dz-status show';
+    status.innerHTML = `<div class="fn">${esc(f.name)}</div><div class="meta">읽는 중…</div>`;
+    try{
+      const rows = await readWorkbookFile(f);
+      const result = onFile(rows, f.name);
+      status.classList.add('ok');
+      status.innerHTML = `<div class="fn">${esc(f.name)}</div><div class="meta">${result}</div>`;
+      state.isSample = false;
+      $('#sampleBanner').style.display='none';
+      render();
+    }catch(err){
+      status.classList.add('err');
+      status.innerHTML = `<div class="fn">${esc(f.name)}</div><div class="meta">읽기 실패: ${esc(err.message||err)}</div>`;
+    }
+  }
+}
+wireDropzone('#dzCause','#fileCause','#statusCause',(rows,name)=>{
+  const parsed = parseCauseRows(rows);
+  state.rawCauses = parsed; state.causeFileName = name;
+  return `${parsed.length}건 인식 (기간: ${parsed.length? parsed[parsed.length-1].date+' ~ '+parsed[0].date : '-'})`;
+});
+wireDropzone('#dzSales','#fileSales','#statusSales',(rows,name)=>{
+  const parsed = parseSalesRows(rows);
+  state.rawSales = parsed; state.salesFileName = name;
+  state.salesHasTime = !!parsed.hasTimeData;
+  const canceled = parsed.filter(s=>s.canceled).length;
+  let msg = `${parsed.length}건 인식 (취소건 ${canceled}건 제외 예정)`;
+  if(parsed.length && !parsed.hasTimeData){
+    msg += ' · 이 카드사 양식에는 승인시각 항목이 없어 집행시간은 비어있게 표시됩니다.';
+  }
+  return msg;
+});
+
+$('#btnMatch').addEventListener('click', runFullMatch);
+$('#btnRematch').addEventListener('click', rematchUnmatchedOnly);
+$('#btnResetAll').addEventListener('click', ()=>{
+  state.rawCauses=null; state.rawSales=null; state.entries=[]; state.salesPool=[]; state.giftRows=[];
+  state.isSample=false; state.salesHasTime=true;
+  $$('.dz-status').forEach(s=>{ s.className='dz-status'; s.innerHTML=''; });
+  $('#fileCause').value=''; $('#fileSales').value='';
+  $('#sampleBanner').style.display='none';
+  $('#giftEnable').checked=false; $('#giftWrap').classList.remove('show');
+  render();
+  toast('초기화되었습니다');
+});
+$('#btnLoadSample').addEventListener('click', ()=>{
+  const {causes, sales} = buildSampleData();
+  state.rawCauses = causes; state.rawSales = sales;
+  state.causeFileName='(예시) 원인행위목록'; state.salesFileName='(예시) 상세매출내역';
+  $('#statusCause').className='dz-status show ok';
+  $('#statusCause').innerHTML = `<div class="fn">예시 데이터</div><div class="meta">${causes.length}건</div>`;
+  $('#statusSales').className='dz-status show ok';
+  $('#statusSales').innerHTML = `<div class="fn">예시 데이터</div><div class="meta">${sales.length}건</div>`;
+  state.isSample = true; state.salesHasTime = true;
+  $('#sampleBanner').style.display='flex';
+  applyQuarter(1);
+  runFullMatch();
+});
+
+/* ============================= events: step 3 ledger edits ============================= */
+$('#ledgerBody').addEventListener('blur', (e)=>{
+  const td = e.target.closest('td[data-field]'); if(!td) return;
+  const tr = td.closest('tr'); const id = tr.dataset.id;
+  const entry = state.entries.find(x=>x.id===id); if(!entry) return;
+  const field = td.dataset.field;
+  let val = td.textContent.trim();
+  if(field==='amount') entry.amount = parseAmountFromText(val);
+  else entry[field] = val;
+  render();
+}, true);
+
+$('#ledgerBody').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-action]'); if(!btn) return;
+  const id = btn.dataset.id;
+  const entry = state.entries.find(x=>x.id===id); if(!entry) return;
+  const action = btn.dataset.action;
+  if(action==='exclude') entry.excluded = true;
+  if(action==='restore') entry.excluded = false;
+  if(action==='delete') state.entries = state.entries.filter(x=>x.id!==id);
+  if(action==='unmatch'){
+    if(entry.saleId){
+      const s = state.salesPool.find(p=>p.id===entry.saleId);
+      if(s) s.usedBy = null;
+    }
+    entry.saleId=null; entry.status='none'; entry.place=''; entry.time='';
+  }
+  render();
+});
+$('#ledgerBody').addEventListener('change', (e)=>{
+  const rowCheck = e.target.closest('input.row-check');
+  if(rowCheck){
+    const entry = state.entries.find(x=>x.id===rowCheck.dataset.id);
+    if(entry) entry.checked = rowCheck.checked;
+    updateBulkUI();
+    return;
+  }
+  const sel = e.target.closest('select[data-action="manual-match"]'); if(!sel) return;
+  const id = sel.dataset.id;
+  const entry = state.entries.find(x=>x.id===id); if(!entry) return;
+  const saleId = sel.value; if(!saleId) return;
+  const sale = state.salesPool.find(s=>s.id===saleId); if(!sale) return;
+  sale.usedBy = entry.id;
+  entry.saleId = sale.id; entry.date = sale.date; entry.time = sale.time; entry.place = sale.merchant;
+  entry.status = 'manual';
+  render();
+});
+$('#checkAll').addEventListener('change', (e)=>{
+  const val = e.target.checked;
+  state.entries.forEach(x=> x.checked = val);
+  render();
+});
+$('#btnApplyBulkTarget').addEventListener('click', ()=>{
+  const val = $('#bulkTargetInput').value.trim();
+  const checked = state.entries.filter(x=>x.checked);
+  if(!checked.length){ toast('먼저 표에서 적용할 행을 체크하세요', true); return; }
+  if(!val){ toast('집행대상 값을 입력하세요', true); return; }
+  checked.forEach(x=> x.target = val);
+  toast(`${checked.length}건에 "${val}"을(를) 적용했습니다`);
+  render();
+});
+
+$('#btnAddRow').addEventListener('click', ()=>{
+  state.entries.push({
+    id:uid(), kind:'added', causeNo:'', date:state.fromDate||'', time:'', title:'', amount:0,
+    place:'', target:'', status:'added', saleId:null, excluded:false, checked:false
+  });
+  render();
+});
+
+/* ============================= events: gift table ============================= */
+$('#giftEnable').addEventListener('change', (e)=>{
+  $('#giftWrap').classList.toggle('show', e.target.checked);
+  if(e.target.checked && !state.giftRows.length){
+    state.giftRows.push({id:uid(), date:'', vendor:'', type:'', purpose:'', qty:'', amount:0, note:''});
+    renderGift();
+  }
+});
+$('#btnAddGift').addEventListener('click', ()=>{
+  state.giftRows.push({id:uid(), date:'', vendor:'', type:'', purpose:'', qty:'', amount:0, note:''});
+  renderGift();
+});
+$('#giftBody').addEventListener('blur', (e)=>{
+  const td = e.target.closest('td[data-gfield]'); if(!td) return;
+  const id = td.closest('tr').dataset.id;
+  const row = state.giftRows.find(x=>x.id===id); if(!row) return;
+  const field = td.dataset.gfield;
+  let val = td.textContent.trim();
+  row[field] = (field==='amount') ? parseAmountFromText(val) : val;
+  renderGift();
+}, true);
+$('#giftBody').addEventListener('click', (e)=>{
+  const btn = e.target.closest('button[data-gaction="delete"]'); if(!btn) return;
+  state.giftRows = state.giftRows.filter(x=>x.id!==btn.dataset.id);
+  renderGift();
+});
+
+/* ============================= export: shared helpers ============================= */
+function getFinalRows(){
+  return state.entries.filter(e=>!e.excluded).slice().sort((a,b)=>{
+    const da=a.date||'9999', db=b.date||'9999';
+    if(da!==db) return da<db?-1:1;
+    return (a.time||'').localeCompare(b.time||'');
+  }).map((e,i)=>({ no:i+1, date:e.date, time:e.time, title:e.title, amount:Number(e.amount)||0, place:e.place, target:e.target }));
+}
+function getFinalGiftRows(){
+  if(!$('#giftEnable').checked) return [];
+  return state.giftRows.filter(g=> g.vendor || g.purpose || g.amount);
+}
+
+/* ============================= export: PDF ============================= */
+async function exportPdf(){
+  const rows = getFinalRows();
+  if(!rows.length){ toast('내보낼 데이터가 없습니다', true); return; }
+  const btn = $('#btnExportPdf'); btn.disabled=true; btn.textContent='PDF 생성 중…';
+  try{
+    const giftRows = getFinalGiftRows();
+    const total = rows.reduce((s,r)=>s+r.amount,0);
+    const title = currentTitleMeta();
+
+    const containerWidth = 1000;
+    const container = document.createElement('div');
+    container.className = 'print-doc';
+    container.style.cssText = `position:fixed; left:-10000px; top:0; width:${containerWidth}px;`;
+    container.innerHTML = buildPrintInnerHtml(rows, giftRows, {org:state.orgName, title, total});
+    document.body.appendChild(container);
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(r=>setTimeout(r,60));
+
+    const scale = 2;
+    const canvas = await html2canvas(container, {scale, backgroundColor:'#ffffff', useCORS:true});
+
+    const titleEl = container.querySelector('.print-title');
+    const unitEl = container.querySelector('.print-unit');
+    const table = container.querySelector('table.print-table');
+    const thead = table.querySelector('thead');
+    const trs = Array.from(table.querySelectorAll('tbody tr'));
+    const giftTitle = container.querySelector('.print-gift-title');
+    const giftTable = container.querySelectorAll('table.print-table')[1];
+
+    const cTop = container.getBoundingClientRect().top;
+    const px = (elm)=> Math.round((elm.getBoundingClientRect().top - cTop) * scale);
+    const ph = (elm)=> Math.round(elm.getBoundingClientRect().height * scale);
+
+    const theadTop = px(thead), theadH = ph(thead);
+    const titleBottom = theadTop;
+    const rowMeta = trs.map(tr=>({ top:px(tr), h:ph(tr) }));
+
+    let giftBlock = null;
+    if(giftTable){
+      const gThead = giftTable.querySelector('thead');
+      const gTrs = Array.from(giftTable.querySelectorAll('tbody tr'));
+      const gTitleTop = px(giftTitle), gTheadTop = px(gThead);
+      giftBlock = {
+        titleTop: gTitleTop, titleH: gTheadTop - gTitleTop,
+        theadTop: gTheadTop, theadH: ph(gThead),
+        rows: gTrs.map(tr=>({top:px(tr), h:ph(tr)}))
+      };
+    }
+
+    const pdf = new window.jspdf.jsPDF({unit:'pt', format:'a4', orientation:'portrait'});
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 26;
+    const contentWpt = pageW - margin*2;
+    const contentHpt = pageH - margin*2;
+    const k = canvas.width / contentWpt;
+    const availPx = contentHpt * k;
+
+    const pages = [];
+    let cursor = 0;
+    let firstPage = true;
+    while(cursor < rowMeta.length){
+      const headerAllowance = firstPage ? titleBottom : 0;
+      let budget = availPx - theadH - headerAllowance - 10*scale;
+      const pageRows = [];
+      let used = 0;
+      while(cursor < rowMeta.length){
+        const r = rowMeta[cursor];
+        if(pageRows.length===0 || used + r.h <= budget){ pageRows.push(r); used += r.h; cursor++; }
+        else break;
+      }
+      pages.push({firstPage, rows:pageRows, used});
+      firstPage = false;
+    }
+    // try to append gift table onto its own page(s) after main table
+    let giftPages = [];
+    if(giftBlock){
+      let gCursor = 0;
+      let gFirst = true;
+      while(gCursor < giftBlock.rows.length || gFirst){
+        const headerAllowance = gFirst ? giftBlock.titleH : 0;
+        let budget = availPx - giftBlock.theadH - headerAllowance - 10*scale;
+        const pageRows = [];
+        let used = 0;
+        while(gCursor < giftBlock.rows.length){
+          const r = giftBlock.rows[gCursor];
+          if(pageRows.length===0 || used + r.h <= budget){ pageRows.push(r); used += r.h; gCursor++; }
+          else break;
+        }
+        giftPages.push({firstPage:gFirst, rows:pageRows, used});
+        gFirst = false;
+        if(pageRows.length===0) break;
+      }
+    }
+
+    function drawPage(pdfPageIsFirstOfDoc, spec, opts){
+      const destW = canvas.width;
+      const destH = (opts.headerAllowance||0) + (opts.theadH||0) + spec.used + 8*scale;
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = destW; pageCanvas.height = Math.max(destH,10);
+      const ctx = pageCanvas.getContext('2d');
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,destW,pageCanvas.height);
+      let y = 0;
+      if(spec.firstPage && opts.headerAllowance){
+        ctx.drawImage(canvas, 0, opts.blockTop, destW, opts.headerAllowance, 0, 0, destW, opts.headerAllowance);
+        y += opts.headerAllowance;
+      }
+      ctx.drawImage(canvas, 0, opts.theadTop, destW, opts.theadH, 0, y, destW, opts.theadH);
+      y += opts.theadH;
+      if(spec.rows.length){
+        const sTop = spec.rows[0].top;
+        const sH = (spec.rows[spec.rows.length-1].top + spec.rows[spec.rows.length-1].h) - sTop;
+        ctx.drawImage(canvas, 0, sTop, destW, sH, 0, y, destW, sH);
+      }
+      if(!pdfPageIsFirstOfDoc) pdf.addPage();
+      const outH = pageCanvas.height / k;
+      pdf.addImage(pageCanvas.toDataURL('image/jpeg',0.93), 'JPEG', margin, margin, contentWpt, outH);
+    }
+
+    let firstOfDoc = true;
+    pages.forEach(p=>{
+      drawPage(firstOfDoc, p, { headerAllowance: p.firstPage? titleBottom:0, blockTop:0, theadTop, theadH });
+      firstOfDoc = false;
+    });
+    giftPages.forEach(p=>{
+      drawPage(firstOfDoc, p, { headerAllowance: p.firstPage? giftBlock.titleH:0, blockTop:giftBlock.titleTop, theadTop:giftBlock.theadTop, theadH:giftBlock.theadH });
+      firstOfDoc = false;
+    });
+
+    document.body.removeChild(container);
+    const fname = `${state.orgName}_${title.replace(/[\\/:*?"<>|]/g,"-")}.pdf`;
+    const buf = pdf.output('arraybuffer');
+    const result = await saveFile(fname, buf);
+    if(result.ok) toast('PDF 파일을 내려받았습니다');
+    else toast('PDF 저장이 취소되었거나 실패했습니다'+(result.err&&result.err.message?': '+result.err.message:''), true);
+  }catch(err){
+    console.error(err);
+    toast('PDF 생성 중 오류가 발생했습니다: '+(err.message||err), true);
+  }finally{
+    btn.disabled=false; btn.textContent='PDF 파일 생성';
+  }
+}
+function buildPrintInnerHtml(rows, giftRows, meta){
+  let html = `<h2 class="print-title">${esc(meta.title)}</h2><div class="print-unit">(단위: 원)</div>
+  <table class="print-table">
+   <colgroup><col style="width:10%"><col style="width:6%"><col style="width:11%"><col style="width:8%"><col style="width:31%"><col style="width:13%"><col style="width:12%"><col style="width:9%"></colgroup>
+   <thead><tr><th>기관명</th><th>번호</th><th>집행일자</th><th>집행시간</th><th>집행내역</th><th>집행액(원)</th><th>장소(사용처)</th><th>집행대상</th></tr></thead>
+   <tbody>`;
+  rows.forEach(r=>{
+    html += `<tr><td class="ctr">${esc(meta.org)}</td><td class="ctr">${r.no}</td><td class="ctr">${esc(r.date)}</td><td class="ctr">${esc(r.time)}</td><td>${esc(r.title)}</td><td class="num">${toWon(r.amount)}</td><td class="ctr">${esc(r.place)}</td><td class="ctr">${esc(r.target)||'&nbsp;'}</td></tr>`;
+  });
+  html += `</tbody><tfoot><tr><td colspan="4">합계</td><td class="num">${toWon(meta.total)}</td><td colspan="3"></td></tr></tfoot></table>`;
+  if(giftRows && giftRows.length){
+    html += `<div class="print-gift-title">상품권 구매 및 사용내역</div>
+    <table class="print-table">
+    <colgroup><col style="width:13%"><col style="width:14%"><col style="width:15%"><col style="width:28%"><col style="width:10%"><col style="width:12%"><col style="width:8%"></colgroup>
+    <thead><tr><th>구매일자</th><th>구매처</th><th>상품권종류</th><th>용도</th><th>구매수량</th><th>총구매액</th><th>비고</th></tr></thead><tbody>`;
+    giftRows.forEach(g=>{
+      html+=`<tr><td class="ctr">${esc(g.date)}</td><td class="ctr">${esc(g.vendor)}</td><td class="ctr">${esc(g.type)}</td><td>${esc(g.purpose)}</td><td class="num">${esc(g.qty)}</td><td class="num">${toWon(g.amount)}</td><td>${esc(g.note)}</td></tr>`;
+    });
+    html+='</tbody></table>';
+  }
+  return html;
+}
+
+/* ============================= export: HWPX ============================= */
+function xmlEsc(s){ return esc(s); }
+function hu(mmVal){ return Math.round(mmVal*2834.6457); }
+
+const HWPX_MIMETYPE = 'application/hwp+zip';
+const HWPX_VERSION_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hv:HCFVersion xmlns:hv="http://www.hancom.co.kr/hwpml/2011/version" tagVersion="1.0" targetApplication="WORDPROCESSOR" major="5" minor="1" micro="0" buildNumber="0" os="1" xmlVersion="1.4" application="Hancom Office Hangul" appVersion="11, 0, 0, 1"/>`;
+const HWPX_SETTINGS_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ha:HWPApplicationSetting xmlns:ha="http://www.hancom.co.kr/hwpml/2011/app">
+<ha:CaretPosition listIDRef="0" paraIDRef="0" pos="0"/>
+</ha:HWPApplicationSetting>`;
+const HWPX_CONTAINER_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ocf:container xmlns:ocf="urn:oasis:names:tc:opendocument:xmlns:container" xmlns:hpf="http://www.hancom.co.kr/hwpml/2011/packagefile">
+<ocf:rootfiles>
+<ocf:rootfile full-path="Contents/content.hpf" media-type="application/hwpml-package+xml"/>
+</ocf:rootfiles>
+</ocf:container>`;
+const HWPX_MANIFEST_XML = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<odf:manifest xmlns:odf="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0">
+<odf:file-entry odf:full-path="/" odf:media-type="application/hwp+zip"/>
+<odf:file-entry odf:full-path="Contents/content.hpf" odf:media-type="application/hwpml-package+xml"/>
+<odf:file-entry odf:full-path="Contents/header.xml" odf:media-type="application/xml"/>
+<odf:file-entry odf:full-path="Contents/section0.xml" odf:media-type="application/xml"/>
+<odf:file-entry odf:full-path="META-INF/container.xml" odf:media-type="text/xml"/>
+<odf:file-entry odf:full-path="settings.xml" odf:media-type="application/xml"/>
+<odf:file-entry odf:full-path="version.xml" odf:media-type="application/xml"/>
+</odf:manifest>`;
+
+function buildHwpxHeaderXml(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hh:head xmlns:hh="http://www.hancom.co.kr/hwpml/2011/head" xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph" xmlns:hc="http://www.hancom.co.kr/hwpml/2011/core" secCnt="1">
+<hh:beginNum page="1" footnote="1" endnote="1" pic="1" tbl="1" equation="1"/>
+<hh:refList>
+<hh:fontfaces itemCnt="1">
+<hh:fontface lang="HANGUL" fontCnt="1">
+<hh:font id="0" face="맑은 고딕" type="TTF" isEmbedded="0"><hh:typeInfo familyType="FCAT_GOTHIC"/></hh:font>
+</hh:fontface>
+</hh:fontfaces>
+<hh:borderFills itemCnt="2">
+<hh:borderFill id="1" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0">
+<hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>
+<hh:leftBorder type="NONE" width="0.1mm" color="#000000"/><hh:rightBorder type="NONE" width="0.1mm" color="#000000"/>
+<hh:topBorder type="NONE" width="0.1mm" color="#000000"/><hh:bottomBorder type="NONE" width="0.1mm" color="#000000"/>
+<hh:diagonal type="NONE" width="0.1mm" color="#000000"/>
+</hh:borderFill>
+<hh:borderFill id="2" threeD="0" shadow="0" centerLine="NONE" breakCellSeparateLine="0">
+<hh:slash type="NONE" Crooked="0" isCounter="0"/><hh:backSlash type="NONE" Crooked="0" isCounter="0"/>
+<hh:leftBorder type="SOLID" width="0.12mm" color="#000000"/><hh:rightBorder type="SOLID" width="0.12mm" color="#000000"/>
+<hh:topBorder type="SOLID" width="0.12mm" color="#000000"/><hh:bottomBorder type="SOLID" width="0.12mm" color="#000000"/>
+<hh:diagonal type="NONE" width="0.1mm" color="#000000"/>
+</hh:borderFill>
+</hh:borderFills>
+<hh:charProperties itemCnt="2">
+<hh:charPr id="0" height="900" textColor="#000000" shadeColor="none" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1">
+<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>
+<hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>
+<hh:spacing hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>
+<hh:relSz hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>
+<hh:offset hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>
+<hh:bold val="0"/><hh:italic val="0"/>
+</hh:charPr>
+<hh:charPr id="1" height="1600" textColor="#000000" shadeColor="none" useFontSpace="0" useKerning="0" symMark="NONE" borderFillIDRef="1">
+<hh:fontRef hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>
+<hh:ratio hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>
+<hh:spacing hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>
+<hh:relSz hangul="100" latin="100" hanja="100" japanese="100" other="100" symbol="100" user="100"/>
+<hh:offset hangul="0" latin="0" hanja="0" japanese="0" other="0" symbol="0" user="0"/>
+<hh:bold val="1"/><hh:italic val="0"/>
+</hh:charPr>
+</hh:charProperties>
+<hh:tabProperties itemCnt="1"><hh:tabPr id="0" autoTabLeft="0" autoTabRight="0"/></hh:tabProperties>
+<hh:paraProperties itemCnt="3">
+<hh:paraPr id="0" tabPrIDRef="0" condense="0" fontLineHeight="0" snapToGrid="1" suppressLineNumbers="0" checked="0">
+<hh:align><hh:horizontal value="LEFT"/><hh:vertical value="BASELINE"/></hh:align>
+<hh:heading type="NONE" idRef="0" level="0"/>
+<hh:breakSetting breakLatinWord="KEEP_WORD" breakNonLatinWord="KEEP_WORD" widowOrphan="0" keepWithNext="0" keepLines="0" pageBreakBefore="0" lineWrap="BREAK"/>
+<hh:autoSpacing eAsianEng="0" eAsianNum="0"/>
+</hh:paraPr>
+<hh:paraPr id="1" tabPrIDRef="0" condense="0" fontLineHeight="0" snapToGrid="1" suppressLineNumbers="0" checked="0">
+<hh:align><hh:horizontal value="CENTER"/><hh:vertical value="BASELINE"/></hh:align>
+<hh:heading type="NONE" idRef="0" level="0"/>
+<hh:breakSetting breakLatinWord="KEEP_WORD" breakNonLatinWord="KEEP_WORD" widowOrphan="0" keepWithNext="0" keepLines="0" pageBreakBefore="0" lineWrap="BREAK"/>
+<hh:autoSpacing eAsianEng="0" eAsianNum="0"/>
+</hh:paraPr>
+<hh:paraPr id="2" tabPrIDRef="0" condense="0" fontLineHeight="0" snapToGrid="1" suppressLineNumbers="0" checked="0">
+<hh:align><hh:horizontal value="RIGHT"/><hh:vertical value="BASELINE"/></hh:align>
+<hh:heading type="NONE" idRef="0" level="0"/>
+<hh:breakSetting breakLatinWord="KEEP_WORD" breakNonLatinWord="KEEP_WORD" widowOrphan="0" keepWithNext="0" keepLines="0" pageBreakBefore="0" lineWrap="BREAK"/>
+<hh:autoSpacing eAsianEng="0" eAsianNum="0"/>
+</hh:paraPr>
+</hh:paraProperties>
+<hh:styles itemCnt="1">
+<hh:style id="0" type="PARA" name="바탕글" engName="Normal" paraPrIDRef="0" charPrIDRef="0" nextStyleIDRef="0" langID="1042" lockForm="0"/>
+</hh:styles>
+</hh:refList>
+</hh:head>`;
+}
+function buildHwpxContentHpf(title){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<opf:package xmlns:opf="http://www.idpf.org/2007/opf/" unique-identifier="hpf001" version="1.0" id="hpf001">
+<opf:metadata>
+<opf:title>${xmlEsc(title)}</opf:title>
+<opf:language>ko</opf:language>
+</opf:metadata>
+<opf:manifest>
+<opf:item id="header" href="header.xml" media-type="application/xml"/>
+<opf:item id="section0" href="section0.xml" media-type="application/xml"/>
+</opf:manifest>
+<opf:spine>
+<opf:itemref idref="header" linear="yes"/>
+<opf:itemref idref="section0" linear="yes"/>
+</opf:spine>
+</opf:package>`;
+}
+
+function buildHwpxTableXml(headerLabels, dataRows, colWeights, aligns, idBase){
+  const contentWidth = hu(180);
+  const sumW = colWeights.reduce((a,b)=>a+b,0);
+  const colWidths = colWeights.map(w=>Math.round(w/sumW*contentWidth));
+  const diff = contentWidth - colWidths.reduce((a,b)=>a+b,0);
+  colWidths[colWidths.length-1]+=diff;
+  const rowH = hu(6.2);
+  const rowCount = 1 + dataRows.length;
+  const alignPr = a => a==='right'?2:(a==='center'?1:0);
+
+  function cellXml(colIdx, rowIdx, text, align, isHeader){
+    const w = colWidths[colIdx];
+    const charPrRef = isHeader? 1 : 0;
+    return `<hp:tc name="" header="${isHeader?1:0}" hasMargin="0" protect="0" editable="0" dirty="0" borderFillIDRef="2">
+<hp:cellAddr colAddr="${colIdx}" rowAddr="${rowIdx}"/>
+<hp:cellSpan colSpan="1" rowSpan="1"/>
+<hp:cellSz width="${w}" height="${rowH}"/>
+<hp:cellMargin left="141" right="141" top="85" bottom="85"/>
+<hp:subList id="0" textDirection="HORIZONTAL" lineWrap="BREAK" vertAlign="CENTER" linkListIDRef="0" linkListNextIDRef="0" textWidth="0" textHeight="0" hasTextRef="0" hasNumRef="0">
+<hp:p id="0" paraPrIDRef="${alignPr(align)}" styleIDRef="0">
+<hp:run charPrIDRef="${isHeader?1:0}"><hp:t>${xmlEsc(text)}</hp:t></hp:run>
+</hp:p>
+</hp:subList>
+</hp:tc>`;
+  }
+
+  let rowsXml = '<hp:tr>' + headerLabels.map((h,i)=>cellXml(i,0,h,'center',true)).join('') + '</hp:tr>';
+  dataRows.forEach((cells, ri)=>{
+    rowsXml += '<hp:tr>' + cells.map((c,i)=>cellXml(i, ri+1, c, aligns[i], false)).join('') + '</hp:tr>';
+  });
+
+  return `<hp:tbl id="${idBase}" zOrder="0" numberingType="TABLE" textWrap="TOP_AND_BOTTOM" textFlow="BOTH_SIDES" lock="0" dropcapstyle="None" pageBreak="CELL" repeatHeader="1" rowCnt="${rowCount}" colCnt="${headerLabels.length}" cellSpacing="0" borderFillIDRef="2" noAdjust="0">
+<hp:sz width="${contentWidth}" widthRelTo="ABSOLUTE" height="${rowH*rowCount}" heightRelTo="ABSOLUTE" protect="0"/>
+<hp:pos treatAsChar="1" affectLSpacing="0" flowWithText="1" allowOverlap="0" holdAnchorAndSO="0" vertRelTo="PARA" horzRelTo="COLUMN" vertAlign="TOP" horzAlign="LEFT" vertOffset="0" horzOffset="0"/>
+<hp:outMargin left="0" right="0" top="0" bottom="0"/>
+<hp:inMargin left="141" right="141" top="141" bottom="141"/>
+${rowsXml}
+</hp:tbl>`;
+}
+
+function buildHwpxSection0(title, orgName, rows, giftRows, total){
+  const mainHeader = ['기관명','번호','집행일자','집행시간','집행내역','집행액(원)','장소(사용처)','집행대상'];
+  const mainWeights = [7,5,11,8,32,12,13,12];
+  const mainAligns = ['center','center','center','center','left','right','center','center'];
+  const mainRows = rows.map(r=>[orgName, String(r.no), r.date||'', r.time||'', r.title||'', toWon(r.amount), r.place||'', r.target||'']);
+  mainRows.push(['','','','','합계', toWon(total), '', '']);
+  const mainTbl = buildHwpxTableXml(mainHeader, mainRows, mainWeights, mainAligns, 1000);
+
+  let giftTbl = '';
+  if(giftRows && giftRows.length){
+    const gHeader = ['구매일자','구매처','상품권종류','용도','구매수량','총구매액','비고'];
+    const gWeights = [13,14,15,28,10,12,8];
+    const gAligns = ['center','center','center','left','right','right','left'];
+    const gRows = giftRows.map(g=>[g.date||'', g.vendor||'', g.type||'', g.purpose||'', String(g.qty||''), toWon(g.amount), g.note||'']);
+    giftTbl = buildHwpxTableXml(gHeader, gRows, gWeights, gAligns, 2000);
+  }
+
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hs:sec xmlns:hs="http://www.hancom.co.kr/hwpml/2011/section" xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph" xmlns:hc="http://www.hancom.co.kr/hwpml/2011/core">
+<hp:p id="0" paraPrIDRef="1" styleIDRef="0"><hp:run charPrIDRef="1"><hp:t>${xmlEsc(title)}</hp:t></hp:run></hp:p>
+<hp:p id="1" paraPrIDRef="0" styleIDRef="0"><hp:run charPrIDRef="0"><hp:t> </hp:t></hp:run></hp:p>
+<hp:p id="2" paraPrIDRef="0" styleIDRef="0"><hp:run charPrIDRef="0">${mainTbl}</hp:run></hp:p>
+${giftTbl? `<hp:p id="3" paraPrIDRef="0" styleIDRef="0"><hp:run charPrIDRef="0"><hp:t> </hp:t></hp:run></hp:p>
+<hp:p id="4" paraPrIDRef="1" styleIDRef="0"><hp:run charPrIDRef="1"><hp:t>상품권 구매 및 사용내역</hp:t></hp:run></hp:p>
+<hp:p id="5" paraPrIDRef="0" styleIDRef="0"><hp:run charPrIDRef="0">${giftTbl}</hp:run></hp:p>` : ''}
+</hs:sec>`;
+}
+
+async function exportHwpx(){
+  const rows = getFinalRows();
+  if(!rows.length){ toast('내보낼 데이터가 없습니다', true); return; }
+  const btn = $('#btnExportHwpx'); btn.disabled=true; btn.textContent='HWPX 생성 중…';
+  try{
+    const giftRows = getFinalGiftRows();
+    const total = rows.reduce((s,r)=>s+r.amount,0);
+    const title = currentTitleMeta();
+
+    const zip = new JSZip();
+    zip.file('mimetype', HWPX_MIMETYPE, {compression:'STORE'});
+    zip.file('version.xml', HWPX_VERSION_XML);
+    zip.file('settings.xml', HWPX_SETTINGS_XML);
+    zip.file('Contents/header.xml', buildHwpxHeaderXml());
+    zip.file('Contents/content.hpf', buildHwpxContentHpf(title));
+    zip.file('Contents/section0.xml', buildHwpxSection0(title, state.orgName, rows, giftRows, total));
+    zip.file('META-INF/container.xml', HWPX_CONTAINER_XML);
+    zip.file('META-INF/manifest.xml', HWPX_MANIFEST_XML);
+
+    const blob = await zip.generateAsync({type:'blob', mimeType:'application/hwp+zip', compression:'DEFLATE', compressionOptions:{level:6}});
+    const fname = `${state.orgName}_${title.replace(/[\\/:*?"<>|]/g,"-")}.hwpx`;
+    const result = await saveFile(fname, blob);
+    if(result.ok) toast('HWPX 파일을 내려받았습니다');
+    else if(result.err && result.err.code==='rejected_extension') toast('이 화면에서는 hwpx 저장이 지원되지 않습니다. 함께 받은 html 파일을 열어서 사용해주세요.', true);
+    else toast('HWPX 저장이 취소되었거나 실패했습니다'+(result.err&&result.err.message?': '+result.err.message:''), true);
+  }catch(err){
+    console.error(err);
+    toast('HWPX 생성 중 오류가 발생했습니다: '+(err.message||err), true);
+  }finally{
+    btn.disabled=false; btn.textContent='HWPX 파일 생성';
+  }
+}
+
+$('#btnExportPdf').addEventListener('click', exportPdf);
+$('#btnExportHwpx').addEventListener('click', exportHwpx);
+
+/* ============================= init ============================= */
+applyQuarter(1);
+render();
+</script>
